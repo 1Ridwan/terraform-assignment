@@ -5,6 +5,18 @@ set -euo pipefail
 dnf -y update
 dnf -y install httpd php php-fpm php-mysqlnd php-json php-gd php-xml php-mbstring php-curl php-zip tar curl unzip rsync
 
+# load proxy modules if not already loaded
+grep -q proxy_module /etc/httpd/conf.modules.d/* || echo 'LoadModule proxy_module modules/mod_proxy.so' > /etc/httpd/conf.modules.d/00-proxy.conf
+grep -q proxy_fcgi_module /etc/httpd/conf.modules.d/* || echo 'LoadModule proxy_fcgi_module modules/mod_proxy_fcgi.so' > /etc/httpd/conf.modules.d/00-proxy_fcgi.conf
+
+# existing php-fpm handler + AllowOverride stays
+
+systemctl enable --now php-fpm
+systemctl enable --now httpd
+
+# health check; fail fast if Apache isn’t serving
+curl -fsS http://127.0.0.1/ >/dev/null
+
 # PHP-FPM with Apache
 cat >/etc/httpd/conf.d/php-fpm.conf <<'CONF'
 <FilesMatch \.php$>

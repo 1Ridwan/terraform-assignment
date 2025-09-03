@@ -2,9 +2,6 @@
 
 resource "aws_vpc" "main" {
   cidr_block       = var.vpc_cidr
-
-  region = var.vpc_region
-
   tags = {
     Name = "main"
   }
@@ -56,7 +53,6 @@ resource "aws_security_group" "instance_sg" {
   name        = "allow_http"
   description = "Allow HTTP inbound traffic and all outbound traffic"
   vpc_id      = aws_vpc.main.id
-
   tags = {
     Name = "instance-sg"
   }
@@ -76,5 +72,3 @@ resource "aws_vpc_security_group_egress_rule" "alb_all_out" {
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1"
 }
-
-# create user data to setup web page

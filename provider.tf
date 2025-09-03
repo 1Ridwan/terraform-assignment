@@ -13,5 +13,5 @@ terraform {
 }
 
 provider "aws" {
-  # Configuration options
+  region = var.vpc_region;
 }
