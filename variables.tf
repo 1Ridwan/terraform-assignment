@@ -29,7 +29,7 @@ variable "az" {
 }
 output "instance_id" { 
     description = "The id of the EC2 instance"
-    value = aws_instance.test.id
-}
+    value = aws_instance.website_instance.id
+    }
 
 
