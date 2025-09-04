@@ -20,7 +20,7 @@ variable "instance_type" {
 
 variable "instance_ami" {
   type = string
-   default = "ami-0cb226682278979e9"
+   default = "ami-046c2381f11878233"
 }
 
 variable "az" {
@@ -28,3 +28,10 @@ variable "az" {
   default = "eu-west-2a"
 }
 
+variable "db_host"      { type = string }          # e.g., mydb.xxxxxx.eu-west-2.rds.amazonaws.com
+variable "db_name"      { type = string }
+variable "db_user"      { type = string }
+variable "db_password"  { 
+    type = string 
+    sensitive = true 
+}

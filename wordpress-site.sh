@@ -1,66 +1,41 @@
 #!/bin/bash
-set -euo pipefail
+# Update packages
+apt-get update -y
+apt-get upgrade -y
 
-# Packages
-dnf -y update
-dnf -y install httpd php php-fpm php-mysqlnd php-json php-gd php-xml php-mbstring php-curl php-zip tar curl unzip rsync
+# Install Apache, MySQL, PHP
+apt-get install -y apache2 php php-mysql libapache2-mod-php mysql-server wget unzip
 
-# load proxy modules if not already loaded
-grep -q proxy_module /etc/httpd/conf.modules.d/* || echo 'LoadModule proxy_module modules/mod_proxy.so' > /etc/httpd/conf.modules.d/00-proxy.conf
-grep -q proxy_fcgi_module /etc/httpd/conf.modules.d/* || echo 'LoadModule proxy_fcgi_module modules/mod_proxy_fcgi.so' > /etc/httpd/conf.modules.d/00-proxy_fcgi.conf
+# Start services
+systemctl start apache2
+systemctl enable apache2
+systemctl start mysql
+systemctl enable mysql
 
-# existing php-fpm handler + AllowOverride stays
+# MySQL Setup
+mysql -e "CREATE DATABASE wordpress;"
+mysql -e "CREATE USER 'wpuser'@'localhost' IDENTIFIED BY 'StrongPassword123';"
+mysql -e "GRANT ALL PRIVILEGES ON wordpress.* TO 'wpuser'@'localhost';"
+mysql -e "FLUSH PRIVILEGES;"
 
-systemctl enable --now php-fpm
-systemctl enable --now httpd
-
-# health check; fail fast if Apache isn’t serving
-curl -fsS http://127.0.0.1/ >/dev/null
-
-# PHP-FPM with Apache
-cat >/etc/httpd/conf.d/php-fpm.conf <<'CONF'
-<FilesMatch \.php$>
-    SetHandler "proxy:unix:/run/php-fpm/www.sock|fcgi://localhost/"
-</FilesMatch>
-DirectoryIndex index.php index.html
-CONF
-# Permalinks
-sed -ri '/<Directory "\/var\/www\/html">/,/<\/Directory>/ s/AllowOverride .*/AllowOverride All/' /etc/httpd/conf/httpd.conf || true
-
-systemctl enable --now php-fpm
-systemctl enable --now httpd
-
-# DB (MariaDB)
-dnf -y install mariadb105-server || dnf -y install mariadb-server
-systemctl enable --now mariadb
-mysql <<'SQL'
-CREATE DATABASE IF NOT EXISTS wordpress CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER IF NOT EXISTS 'wpuser'@'localhost' IDENTIFIED BY 'StrongPassword123';
-ALTER USER 'wpuser'@'localhost' IDENTIFIED BY 'StrongPassword123';
-GRANT ALL PRIVILEGES ON wordpress.* TO 'wpuser'@'localhost';
-FLUSH PRIVILEGES;
-SQL
-
-# WordPress
-cd /tmp
-curl -fsSLO https://wordpress.org/latest.tar.gz
+# Install WordPress
+cd /var/www/html
+rm -f index.html
+wget https://wordpress.org/latest.tar.gz
 tar -xzf latest.tar.gz
-rsync -a --delete wordpress/ /var/www/html/
+cp -r wordpress/* .
 rm -rf wordpress latest.tar.gz
 
-# Config
-if [ ! -f /var/www/html/wp-config.php ]; then
-  cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
-  sed -ri "s/database_name_here/wordpress/; s/username_here/wpuser/; s/password_here/StrongPassword123/" /var/www/html/wp-config.php
-  echo "define('FS_METHOD','direct');" >> /var/www/html/wp-config.php  # why: plugin/theme updates without FTP.
-  curl -fsS https://api.wordpress.org/secret-key/1.1/salt/ >> /var/www/html/wp-config.php
-fi
+# Configure WordPress
+cp wp-config-sample.php wp-config.php
+sed -i "s/database_name_here/wordpress/" wp-config.php
+sed -i "s/username_here/wpuser/" wp-config.php
+sed -i "s/password_here/StrongPassword123/" wp-config.php
 
-# Permissions
-chown -R root:root /var/www/html
-find /var/www/html -type d -exec chmod 0755 {} \;
-find /var/www/html -type f -exec chmod 0644 {} \;
-install -d -o apache -g apache -m 0755 /var/www/html/wp-content/uploads
-touch /var/www/html/.htaccess && chown apache:apache /var/www/html/.htaccess
+# Set permissions
+chown -R www-data:www-data /var/www/html
+chmod -R 755 /var/www/html
 
-systemctl reload httpd
+# Enable Apache rewrite
+a2enmod rewrite
+systemctl restart apache2

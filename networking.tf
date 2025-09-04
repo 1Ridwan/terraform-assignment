@@ -10,7 +10,6 @@ resource "aws_vpc" "main" {
 resource "aws_subnet" "public" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = var.subnet_cidr
-  availability_zone       = var.az
   map_public_ip_on_launch = true # give subnet public IP
 
   tags = {
@@ -31,13 +30,15 @@ resource "aws_internet_gateway" "main" {
 # create route table for public subnet to route all traffic to the internet to the IGW
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.main.id
-  }
   tags = {
     Name = "public_route_table"
   }
+}
+
+resource "aws_route" "public_default_ipv4" {
+  route_table_id         = aws_route_table.public.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.main.id  # why: default route to internet.
 }
 
 # associate the route tables for public subnet
@@ -58,17 +59,25 @@ resource "aws_security_group" "instance_sg" {
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "instance_http_in" {
+resource "aws_vpc_security_group_ingress_rule" "http_in" {
   security_group_id = aws_security_group.instance_sg.id
   cidr_ipv4         = "0.0.0.0/0"
-  from_port         = 80
   ip_protocol       = "tcp"
-  to_port           = 80
+  from_port         = 80
+  to_port           = 80           # expose WordPress over HTTP
 }
 
-resource "aws_vpc_security_group_egress_rule" "alb_all_out" {
+
+resource "aws_vpc_security_group_ingress_rule" "ssh_in" {
   security_group_id = aws_security_group.instance_sg.id
- 
+  cidr_ipv4         = "152.37.123.184/32"
+  from_port         = 22
+  ip_protocol       = "tcp"
+  to_port           = 22
+}
+
+resource "aws_vpc_security_group_egress_rule" "all_out" {
+  security_group_id = aws_security_group.instance_sg.id
   cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "-1"
+  ip_protocol       = "-1"        # allow updates/package repos/DB egress if needed.
 }
