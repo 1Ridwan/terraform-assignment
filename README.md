@@ -11,6 +11,7 @@ This repo contains terraform code to provision a WordPress web server in a custo
 - Custom VPC with:
   - Internet Gateway (IGW) for outbound internet access
   - Security Group allowing inbound port 80 only (HTTP) to reach WordPress, inbound port 22 (SSH) restricted to my (your) IP, and all outbound traffic to the internet to download packages/updates -> Principal of least privileges
+- Use environment variables for sensitive credentials
 - Outputs the public IP of the server
 
 ---
