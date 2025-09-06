@@ -67,7 +67,7 @@ resource "aws_vpc_security_group_ingress_rule" "http_in" {
   to_port           = 80         
 }
 
-# allow SSH only from my IP address ( hidden in .tfvars )
+# allow SSH only from my IP address ( var.my_ip hidden in .tfvars )
 resource "aws_vpc_security_group_ingress_rule" "restrict_ssh" {
   security_group_id = aws_security_group.instance_sg.id
   cidr_ipv4         = var.my_ip
