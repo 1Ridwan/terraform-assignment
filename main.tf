@@ -1,11 +1,19 @@
 module "wordpress" {
-  source = "/modules/wordpress"
-  name = "wordpress_instance"
-  ami                         = var.instance_ami
+  source = "./modules/wordpress"
+  instance_ami                         = var.instance_ami
   instance_type               = var.instance_type
-  subnet_id                   = module.networking.aws_subnet.public.id
-  vpc_security_group_ids      = [module.networking.aws_security_group.instance_sg.id]
-  associate_public_ip_address = var.public_ip
-  user_data                   = file("${path.module}../../wordpress-site.sh")
-  user_data_replace_on_change = var.change_user_data
+  public_ip = var.public_ip
+  change_user_data = var.change_user_data
+  subnet_id               = module.networking.subnet_id
+  security_group_ids = [module.networking.security_group_id]
+
+  user_data           = file("${path.root}/wordpress-site.sh")
+}
+
+module "networking" {
+    source = "./modules/networking"
+    vpc_cidr = var.vpc_cidr
+    vpc_region = var.vpc_region
+    subnet_cidr = var.subnet_cidr
+    az = var.az
 }

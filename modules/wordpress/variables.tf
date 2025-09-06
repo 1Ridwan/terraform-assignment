@@ -17,3 +17,8 @@ variable "change_user_data" {
     type = bool
     default = true
 }
+
+variable "subnet_id"              { type = string }          # or subnet_ids = list(string)
+variable "security_group_ids" { type = list(string) } 
+
+variable "user_data" { type = string }

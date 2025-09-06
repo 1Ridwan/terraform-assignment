@@ -10,11 +10,6 @@ variable "subnet_cidr" {
     type = string  
 }
 
-
-
-
-
 variable "az" {
   type = string
-  default = "eu-west-2a"
 }
