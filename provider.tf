@@ -10,10 +10,11 @@ terraform {
   backend "s3" {
     bucket = "terraform-state-ridwan"
     key = "terraform.tfstate"
-    region = var.vpc_region
+    region = "eu-west-2"
   }
 }
 
 provider "aws" {
   region = var.vpc_region
+  profile = "default"
 }
