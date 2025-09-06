@@ -3,10 +3,10 @@
 apt-get update -y
 apt-get upgrade -y
 
-# Install Apache, MySQL, PHP
+# Install Apache, PHP, MySQL
 apt-get install -y apache2 php php-mysql libapache2-mod-php mysql-server wget unzip
 
-# Start services
+# Start and enable services
 systemctl start apache2
 systemctl enable apache2
 systemctl start mysql
@@ -14,7 +14,7 @@ systemctl enable mysql
 
 # MySQL Setup
 mysql -e "CREATE DATABASE wordpress;"
-mysql -e "CREATE USER 'wpuser'@'localhost' IDENTIFIED BY 'StrongPassword123';"
+mysql -e "CREATE USER 'wpuser'@'localhost' IDENTIFIED BY 'StrongPassword';"
 mysql -e "GRANT ALL PRIVILEGES ON wordpress.* TO 'wpuser'@'localhost';"
 mysql -e "FLUSH PRIVILEGES;"
 
@@ -30,7 +30,7 @@ rm -rf wordpress latest.tar.gz
 cp wp-config-sample.php wp-config.php
 sed -i "s/database_name_here/wordpress/" wp-config.php
 sed -i "s/username_here/wpuser/" wp-config.php
-sed -i "s/password_here/StrongPassword123/" wp-config.php
+sed -i "s/password_here/StrongPassword/" wp-config.php
 
 # Set permissions
 chown -R www-data:www-data /var/www/html
