@@ -30,7 +30,7 @@ rm -rf wordpress latest.tar.gz
 cp wp-config-sample.php wp-config.php
 sed -i "s/database_name_here/wordpress/" wp-config.php
 sed -i "s/username_here/wpuser/" wp-config.php
-sed -i "s/password_here/StrongPassword123/" wp-config.php
+sed -i "s/password_here/StrongPassword/" wp-config.php
 
 # Set permissions
 chown -R www-data:www-data /var/www/html
