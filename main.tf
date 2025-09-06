@@ -6,7 +6,7 @@ module "wordpress" {
   change_user_data      = var.change_user_data
   subnet_id             = module.networking.subnet_id
   security_group_ids    = [module.networking.security_group_id]
-  user_data           = file("${path.root}/wordpress-site.sh")
+  user_data             = file("${path.root}/wordpress-site.sh")
 }
 
 module "networking" {
@@ -15,4 +15,5 @@ module "networking" {
     vpc_region         = var.vpc_region
     subnet_cidr        = var.subnet_cidr
     az                 = var.az
+    my_ip              = var.my_ip
 }

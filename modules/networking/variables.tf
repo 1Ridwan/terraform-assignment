@@ -13,3 +13,7 @@ variable "subnet_cidr" {
 variable "az" {
   type = string
 }
+
+variable "my_ip" {
+  type = string
+}

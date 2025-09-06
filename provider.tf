@@ -5,6 +5,8 @@ terraform {
       version = "6.9.0"
     }
   }
+
+  # use remote state file
   backend "s3" {
     bucket = "terraform-state-ridwan"
     key = "terraform.tfstate"
