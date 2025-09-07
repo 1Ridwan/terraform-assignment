@@ -54,7 +54,7 @@ This repo contains terraform code to provision a WordPress web server in a custo
 ---
 
 ## Prerequisites
-- Terraform (version 1.6.0 or higher, must be earlier version than 7.0.0)
+- Terraform (v1.6.0 or newer)
 - AWS account + credentials
 - S3 bucket for state (update `provider.tf` backend)
 
