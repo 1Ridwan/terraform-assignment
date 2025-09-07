@@ -48,6 +48,7 @@ This repo contains terraform code to provision a WordPress web server in a custo
 ├─ terraform.tfvars   # Env-specific values
 ├─ wordpress-site.sh  # User data for WordPress setup
 └─ .gitignore
+└─ .terraform.lock.hcl
 
 ````
 
