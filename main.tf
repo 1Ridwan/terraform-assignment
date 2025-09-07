@@ -2,7 +2,7 @@ module "wordpress" {
   source                = "./modules/wordpress"
   instance_ami          = var.instance_ami
   instance_type         = var.instance_type
-  public_ip             = var.public_ip
+  make_public             = var.make_public
   change_user_data      = var.change_user_data
   subnet_id             = module.networking.subnet_id
   security_group_ids    = [module.networking.security_group_id]

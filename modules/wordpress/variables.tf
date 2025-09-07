@@ -6,7 +6,7 @@ variable "instance_ami" {
   type = string
 }
 
-variable "public_ip" {
+variable "make_public" {
     type = bool
     default = true
 }

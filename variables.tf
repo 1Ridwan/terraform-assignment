@@ -2,7 +2,7 @@
 
 variable "instance_ami" { type = string }
 variable "instance_type" { type = string }
-variable "public_ip" { type = bool }
+variable "make_public" { type = bool } # determines whether instance gets public ip
 variable "change_user_data" { type = bool }
 
 
