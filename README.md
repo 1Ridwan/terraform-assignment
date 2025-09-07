@@ -89,6 +89,6 @@ terraform destroy
 
 ## What I Learned / Issues Faced
 
-* Tried to call variables/resources from other modules directly; fixed by outputting from the source module and consuming at the root
+* Tried to call variables/resources from one module to another modules directly; fixed by outputting from the source module and consuming at the root
 * User data initially misconfigured → WordPress failed to load -> Resolved by aligning `DB_*` vars in user_data and .tfvars
 * Many troubleshooting sessions were caused by clock skew; I resolved this by enabling NTP time sync so my system clock stayed aligned with AWS
